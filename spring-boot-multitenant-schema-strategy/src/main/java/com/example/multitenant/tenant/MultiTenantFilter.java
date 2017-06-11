@@ -7,12 +7,20 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
-public class MultiTenantFilter implements javax.servlet.Filter{
-    private String tenantKey="X-TENANT-ID";
-    private String defaultTenant="default";
+import org.springframework.beans.factory.annotation.Value;
 
+@WebFilter
+public class MultiTenantFilter implements javax.servlet.Filter{
+	
+	@Value("${multitenant.tenantKey}")
+    private String tenantKey;
+
+    @Value("${multitenant.defaultTenant}")
+    private String defaultTenant;
+	
 	@Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }

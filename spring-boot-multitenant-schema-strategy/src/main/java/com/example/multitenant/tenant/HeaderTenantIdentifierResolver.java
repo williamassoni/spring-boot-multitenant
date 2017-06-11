@@ -1,19 +1,32 @@
 package com.example.multitenant.tenant;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 @Component
 public class HeaderTenantIdentifierResolver implements CurrentTenantIdentifierResolver {
 
-	private @Autowired HttpServletRequest request;
+	@Value("${multitenant.tenantKey}")
+    private String tenantKey;
+
+    @Value("${multitenant.defaultTenant}")
+    private String defaultTenant;
 	
 	@Override
 	public String resolveCurrentTenantIdentifier() {
-		return request.getHeader("X-TENANT-ID");
+		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        
+		if (requestAttributes != null) {
+            String tenantId = (String) requestAttributes.getAttribute(tenantKey, RequestAttributes.SCOPE_REQUEST);
+            if (tenantId != null) {
+                return tenantId;
+            }
+        }
+
+        return defaultTenant;
 	}
 
     @Override
