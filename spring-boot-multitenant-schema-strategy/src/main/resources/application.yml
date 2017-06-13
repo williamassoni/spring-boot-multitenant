@@ -11,3 +11,10 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: false
 
+flyway:
+    enabled: true
+    user: postres
+    password: 
+    locations: classpath:db/migration
+    schemas: tenant1,tenant2
+
