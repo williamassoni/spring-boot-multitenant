@@ -16,5 +16,5 @@ flyway:
     user: postres
     password: 
     locations: classpath:db/migration
-    schemas: tenant1,tenant2,tenant3
+    schemas: tenant1,tenant2
 

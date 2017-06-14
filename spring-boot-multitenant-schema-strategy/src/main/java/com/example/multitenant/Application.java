@@ -1,11 +1,14 @@
 package com.example.multitenant;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import java.util.Arrays;
+
+import org.flywaydb.core.Flyway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.annotation.Bean;
 
 //docker run --name some-postgres -p 5432:5432 -d postgres
 //curl -v -H "X-TENANT-ID: tenant_2" "http://localhost:8080/persons"
@@ -14,25 +17,22 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @ServletComponentScan
 public class Application {
 
-	@Autowired
-    private AutowireCapableBeanFactory beanFactory;
-
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-/*
+	
 	@Bean
-    public FilterRegistrationBean myFilter() {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
-        Filter tenantFilter = new MultiTenantFilter();
-        beanFactory.autowireBean(tenantFilter);
-        registration.setFilter(tenantFilter);
-        registration.addUrlPatterns("/*");
-        return registration;
-    }
-	*/
-	/*@Bean
-	public RequestContextFilter requestContextListener(){
-	    return new RequestContextFilter();
-	} */
+	public FlywayMigrationStrategy flywayMigrationStrategy(){
+		return new FlywayMigrationStrategy() {
+			@Override
+			public void migrate(Flyway migrate) {
+				String schemas[] = Arrays.copyOf(migrate.getSchemas(),migrate.getSchemas().length);
+				
+				for (String schema : schemas) {
+					migrate.setSchemas(schema);
+					migrate.migrate();
+				}
+			}
+		};
+	}
 }
